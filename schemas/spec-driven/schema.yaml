@@ -269,8 +269,14 @@ apply:
   requires: [tasks]
   tracks: tasks.md
   instruction: |
-    START — before the first pending task (skip if proposal.md has a `Jira:` line
-    and you are already on its branch). Use the configured Jira MCP; never hardcode ids.
+    START — before the first pending task (skip only if proposal.md has `Jira:`
+    and a user-confirmed `Base branch:` line and you are already on its task branch).
+    Use the configured Jira MCP; never hardcode ids.
+    0. Ask the user which existing branch to start from AND target the PR against:
+       the default branch or a feature branch (for example, feature A for fixes).
+       Wait for their answer before creating a ticket, branch, or worktree; never
+       choose automatically. Verify the branch exists and record
+       `Base branch: <base-branch>` in proposal.md. Reuse that confirmed choice on resume.
     1. Ticket: Jira project = `Jira project:` in openspec/config.yaml `context`.
        If missing, list visible Jira projects, pick the one matching the repo name,
        confirm with the user once, then add `Jira project: <KEY>` to that context.
@@ -278,10 +284,10 @@ apply:
        Why + What Changes from proposal.md, the tasks.md list, path of the change dir.
        Put `Jira: <KEY-123> <url>` as line 2 of proposal.md. Move ticket to In Progress.
     2. Checkout, branch `<KEY-123>-<change-name>`:
-       - On the default branch with no changes outside this change dir:
-         `git switch -c <branch>` (uncommitted artifacts come along).
+       - On the confirmed base branch with no changes outside this change dir:
+         `git switch -c <branch> <base-branch>` (uncommitted artifacts come along).
        - Otherwise another piece of work lives here, so isolate it in a worktree:
-         `git worktree add ../<repo-dir>-<KEY-123> -b <branch> <default-branch>`,
+         `git worktree add ../<repo-dir>-<KEY-123> -b <branch> <base-branch>`,
          copy this change dir and root `.env*` files into it, tell the user the path,
          and do all further work inside it.
        Commit the artifacts: `docs(<KEY-123>): openspec <change-name>`.
@@ -291,8 +297,10 @@ apply:
 
     REVIEW — when every task is checked and the project's format/lint/tests pass:
     1. Commit the rest, `git push -u origin HEAD`.
-    2. Unless `gh pr view` finds one, `gh pr create` — title `<KEY-123>: <proposal title>`,
-       body: proposal summary, Jira link, change dir path.
+    2. Unless `gh pr view` finds one, `gh pr create --base <base-branch>` using the
+       confirmed `Base branch:` from proposal.md — title `<KEY-123>: <proposal title>`,
+       body: proposal summary, Jira link, change dir path. If an existing PR targets
+       a different base, pause and ask the user before changing it.
     3. Move the Jira ticket to the transition containing "Review" (none: list and ask);
        comment the PR URL on it.
     4. Report ticket status, PR URL, branch/worktree path. If a worktree was used,
