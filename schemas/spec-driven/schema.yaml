@@ -304,4 +304,5 @@ apply:
     3. Move the Jira ticket to the transition containing "Review" (none: list and ask);
        comment the PR URL on it.
     4. Report ticket status, PR URL, branch/worktree path. If a worktree was used,
-       suggest `git worktree remove <path>` after merge; do not run it.
+       suggest `git worktree remove <path>` after the PR opens, from another
+       directory and only after checking for uncommitted changes; do not run it.

@@ -55,7 +55,7 @@ describe('formatOptionalWorkflowsNote', () => {
 
     expect(note).not.toBeNull();
     expect(note?.[0]).toBe(
-      'Note: 6 more workflows are available (new, continue, ff, bulk-archive, verify, onboard).'
+      'Note: 7 more workflows are available (new, continue, ff, bulk-archive, verify, onboard, learn).'
     );
     expect(note?.[1]).toBe(
       'Add them with `openspec config profile`.'
