@@ -277,11 +277,16 @@ apply:
        Wait for their answer before creating a ticket, branch, or worktree; never
        choose automatically. Verify the branch exists and record
        `Base branch: <base-branch>` in proposal.md. Reuse that confirmed choice on resume.
+       In the same question, ask who the Jira ticket should be assigned to; default
+       to the current Jira user (the one the MCP is authenticated as) if they give no
+       one. Resolve a named person to their account id via the Jira MCP user lookup.
     1. Ticket: Jira project = `Jira project:` in openspec/config.yaml `context`.
        If missing, list visible Jira projects, pick the one matching the repo name,
        confirm with the user once, then add `Jira project: <KEY>` to that context.
        Create a Story (Task if no Story) — summary: proposal title; description:
        Why + What Changes from proposal.md, the tasks.md list, path of the change dir.
+       Always set the assignee explicitly to the person chosen in step 0 (never leave
+       it unassigned or to the project default) and tell the user who it went to.
        Put `Jira: <KEY-123> <url>` as line 2 of proposal.md. Move ticket to In Progress.
     2. Checkout, branch `<KEY-123>-<change-name>`:
        - On the confirmed base branch with no changes outside this change dir:
