@@ -39,12 +39,12 @@ The skills come in two sets:
 - **Core**: installed by default, the main planning loop.
 - **Optional**: installed only when you add them, via [Profiles](../customize/profiles.md).
 
-Every skill expects a project that already uses OpenSpec. Before its first step that writes anything, a skill checks for a resolved root. What happens when there is none depends on how the skill was reached:
+Except for `openspec-learn`, every skill expects a project that already uses OpenSpec. Before its first step that writes anything, those skills check for a resolved root. What happens when there is none depends on how the skill was reached:
 
 - **Auto-selected**: your agent picked the skill on its own, without you naming OpenSpec. It drops OpenSpec and answers your request normally, the way it would with OpenSpec not installed.
 - **Explicit OpenSpec request**: you named OpenSpec or invoked the skill by name. It stops before writing and asks how to proceed: run `openspec init` here, target a store with `--store <id>`, or continue without OpenSpec. It waits for your answer.
 
-Invoking a skill by name is always the second case. A project whose `openspec/config.yaml` names a store this machine cannot resolve (not registered, or a malformed `store:` line) is not treated as uninitialized: the skill stops and shows the store error with its fix. No skill creates an `openspec/` directory on its own in either case. The entries below describe what each skill does once a root is in place.
+Invoking a skill by name is always the second case, except for `openspec-learn`. A project whose `openspec/config.yaml` names a store this machine cannot resolve (not registered, or a malformed `store:` line) is not treated as uninitialized: the skill stops and shows the store error with its fix. No skill creates an `openspec/` directory on its own in either case.
 
 | Skill | Job | Type |
 |---|---|---|
@@ -60,6 +60,7 @@ Invoking a skill by name is always the second case. A project whose `openspec/co
 | [openspec-verify-change](#openspec-verify-change) | Check the implementation matches the plan | Optional |
 | [openspec-bulk-archive-change](#openspec-bulk-archive-change) | Archive several change proposals at once | Optional |
 | [openspec-onboard](#openspec-onboard) | Learn the workflow by doing one real change proposal end to end | Optional |
+| [openspec-learn](#openspec-learn) | Learn from a completed change or fix | Optional |
 
 Each entry below names the skill that owns the next step. A skill reads the same whatever your profile, so it can't assume the next skill is there. Where a step belongs to another skill, it either checks when it runs ("if that skill is installed, otherwise…") or follows the recovery step the CLI prints. Which set you get is [Profiles](../customize/profiles.md).
 
@@ -183,3 +184,13 @@ Learn the workflow by doing one real change proposal end to end.
 | **Arguments** | None. It scans your codebase for small starter tasks and asks you to pick one or describe your own. |
 | **Creates** | A real change proposal for the chosen task, one artifact at a time, then real code once you confirm implementation. Archives the change proposal at the end. |
 | **Response** | A narrated walkthrough of the full cycle with pauses for your input: explore, create, build each artifact, implement, archive. Ends with a recap and a pointer to `openspec-propose`. Takes about 15 to 20 minutes. |
+
+## openspec-learn
+
+Learn from a completed change or fix, with or without an OpenSpec project.
+
+| Contract | Description |
+|---|---|
+| **Arguments** | A change, PR, commit range, or files to review. If the scope is unclear, the agent asks. |
+| **Creates** | An Obsidian note only when you request it and approve its contents and destination. The [vault path](configuration/config-yaml.md#learnobsidianvaultpath) is optional. Never code or OpenSpec artifacts. |
+| **Response** | A summary and up to three lessons grounded in the work, or an explanation when there is no worthwhile lesson or enough evidence. |

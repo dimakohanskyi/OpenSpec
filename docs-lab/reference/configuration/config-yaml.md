@@ -14,6 +14,7 @@ Each OpenSpec project keeps its config file at `openspec/config.yaml`, in the pr
 | `context` | string | No | Injected into every artifact, apply, and archive |
 | `rules` | map: artifact ID → list of strings | No | Extra rules added to one artifact's built-in guidance |
 | `operations` | map: operation → guidance list | No | Advisory guidance for apply and archive work |
+| `learn.obsidianVaultPath` | non-empty string | No | Obsidian vault path for `openspec-learn` |
 | `store` | string | No | Fallback OpenSpec root when this openspec/ is config-only |
 | `references` | list | No | Stores whose specs are indexed into instructions |
 | `skillsScope` | string: `project` | No | The team keeps OpenSpec's skills in this repo |
@@ -54,6 +55,29 @@ operations:
 ```
 
 Only `apply` and `archive` are read.
+
+### learn.obsidianVaultPath
+
+Set the optional Obsidian vault path used by `openspec-learn`:
+
+```yaml
+learn:
+  obsidianVaultPath: /path/to/your/vault
+```
+
+Relative paths are resolved from the directory containing `openspec/`. The skill
+uses the path only when you request a note.
+
+The path precedence is:
+
+1. A path you supply to the agent.
+2. `learn.obsidianVaultPath` in the working project's config.
+3. `OPENSPEC_OBSIDIAN_VAULT`.
+4. The agent asks you for a path.
+
+The agent reports an unreadable config or invalid configured path and asks
+instead of silently falling back. It asks for approval of the note and its
+destination before writing. Without a project config, the skill still works.
 
 ### store
 

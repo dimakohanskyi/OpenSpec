@@ -34,8 +34,15 @@ describe('one skill text for every workflow profile', () => {
     expect(skill?.dirName).toBe('openspec-learn');
     expect(command?.id).toBe('learn');
     expect(command?.body).toBe(skill?.template.instructions);
-    expect(skill?.template.instructions).toContain('OPENSPEC_OBSIDIAN_VAULT');
-    expect(skill?.template.instructions).toContain('wait for explicit approval');
+    expect(skill?.template.instructions).toContain(
+      'the path supplied by the user; `learn.obsidianVaultPath` in the working project\'s `openspec/config.yaml`; `OPENSPEC_OBSIDIAN_VAULT`; then ask the user'
+    );
+    expect(skill?.template.instructions).toContain('If no project config exists, continue without one');
+    expect(skill?.template.instructions).toContain('when both exist, use `config.yaml`');
+    expect(skill?.template.instructions).toContain('Resolve a relative configured path from the directory containing `openspec/`');
+    expect(skill?.template.instructions).toContain('report the problem and ask rather than silently using another path');
+    expect(skill?.template.instructions).toContain('unless the user explicitly asks for a note');
+    expect(skill?.template.instructions).toContain('wait for explicit approval before creating or modifying a file');
   });
 
   it.each(WORKFLOW_LISTS)('returns only the listed skills for %s, each with the unfiltered text', (_label, workflows) => {

@@ -17,7 +17,11 @@ function getLearnInstructions(): string {
 
 **Optional Obsidian note**
 
-- Do not write to a vault unless the user explicitly asks for a note. Use the user's supplied vault path or the \`OPENSPEC_OBSIDIAN_VAULT\` environment variable; if neither is set, ask for the path. Never guess it.
+- Do not write to a vault unless the user explicitly asks for a note.
+- Choose the vault path in this order: the path supplied by the user; \`learn.obsidianVaultPath\` in the working project's \`openspec/config.yaml\`; \`OPENSPEC_OBSIDIAN_VAULT\`; then ask the user. Never guess it.
+- If no path was supplied, locate the working project's config from the work being reviewed, not an unrelated store or worktree. If no project config exists, continue without one. When only \`openspec/config.yml\` exists, use it; when both exist, use \`config.yaml\`.
+- The configured path must be a non-empty string. Resolve a relative configured path from the directory containing \`openspec/\`. If the selected config cannot be read or parsed, or the configured field is invalid, report the problem and ask rather than silently using another path.
+- Check that the selected vault directory exists and is accessible. Report errors and ask for another path; do not create or guess a vault.
 - When a note is requested, inspect relevant existing notes to avoid duplication. Present the proposed note and destination, then wait for explicit approval before creating or modifying a file. Never overwrite an existing note without approval; report access errors instead of claiming success.
 - Keep the note focused on the selected lessons, with useful context and references. Do not include secrets or sensitive project details.
 

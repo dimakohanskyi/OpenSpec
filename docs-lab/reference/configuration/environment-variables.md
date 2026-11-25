@@ -24,3 +24,9 @@ OPENSPEC_SKILLS_SCOPE=project openspec init --tools claude
 ```
 
 A validation-only job can run `openspec validate --all` directly.
+
+## OPENSPEC_OBSIDIAN_VAULT
+
+Provides a fallback vault path for `openspec-learn`. See
+[`learn.obsidianVaultPath`](config-yaml.md#learnobsidianvaultpath) for the path
+precedence and note approval.

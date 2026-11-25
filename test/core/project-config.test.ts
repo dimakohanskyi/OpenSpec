@@ -197,6 +197,44 @@ githubCopilot:
         expect(consoleWarnSpy).not.toHaveBeenCalled();
       });
 
+      it('reads the optional learning vault path without changing its spelling', () => {
+        const configDir = path.join(tempDir, 'openspec');
+        fs.mkdirSync(configDir, { recursive: true });
+        fs.writeFileSync(
+          path.join(configDir, 'config.yaml'),
+          'schema: spec-driven\nlearn:\n  obsidianVaultPath: "../My notes"\n'
+        );
+
+        expect(readProjectConfig(tempDir)?.learn).toEqual({ obsidianVaultPath: '../My notes' });
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+      });
+
+      it.each(['42', '""', '"   "', 'null'])(
+        'warns and omits an invalid learning vault path: %s',
+        (value) => {
+          const configDir = path.join(tempDir, 'openspec');
+          fs.mkdirSync(configDir, { recursive: true });
+          fs.writeFileSync(
+            path.join(configDir, 'config.yaml'),
+            `schema: spec-driven\nlearn:\n  obsidianVaultPath: ${value}\n`
+          );
+
+          expect(readProjectConfig(tempDir)).toEqual({ schema: 'spec-driven' });
+          expect(consoleWarnSpy).toHaveBeenCalledWith(
+            expect.stringContaining("Invalid 'learn.obsidianVaultPath'")
+          );
+        }
+      );
+
+      it('warns and keeps other fields when learn is not a map', () => {
+        const configDir = path.join(tempDir, 'openspec');
+        fs.mkdirSync(configDir, { recursive: true });
+        fs.writeFileSync(path.join(configDir, 'config.yaml'), 'schema: spec-driven\nlearn: invalid\n');
+
+        expect(readProjectConfig(tempDir)).toEqual({ schema: 'spec-driven' });
+        expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Invalid 'learn' field"));
+      });
+
       it('should warn on a non-boolean cloudAgent and keep the rest of the config', () => {
         const configDir = path.join(tempDir, 'openspec');
         fs.mkdirSync(configDir, { recursive: true });

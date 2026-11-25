@@ -86,6 +86,13 @@ export const ProjectConfigSchema = z.object({
     .optional()
     .describe('GitHub Copilot integration preferences'),
 
+  learn: z
+    .object({
+      obsidianVaultPath: z.string().refine((value) => value.trim().length > 0).optional(),
+    })
+    .optional()
+    .describe('Preferences for the learning workflow'),
+
   // Optional: `project` records that the team chose to keep OpenSpec's skills
   // in this repository, so `openspec update` stops offering the move to the
   // skills installed on each machine.
@@ -447,6 +454,19 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
         }
       } else {
         console.warn(`Invalid 'githubCopilot' field in config (must be an object)`);
+      }
+    }
+
+    if (raw.learn !== undefined) {
+      if (typeof raw.learn === 'object' && raw.learn !== null && !Array.isArray(raw.learn)) {
+        const vaultPath = (raw.learn as Record<string, unknown>).obsidianVaultPath;
+        if (typeof vaultPath === 'string' && vaultPath.trim().length > 0) {
+          config.learn = { obsidianVaultPath: vaultPath };
+        } else if (vaultPath !== undefined) {
+          console.warn(`Invalid 'learn.obsidianVaultPath' field in config (must be a non-empty string)`);
+        }
+      } else {
+        console.warn(`Invalid 'learn' field in config (must be an object)`);
       }
     }
 
