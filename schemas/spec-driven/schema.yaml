@@ -295,13 +295,16 @@ apply:
          `git worktree add ../<repo-dir>-<KEY-123> -b <branch> <base-branch>`,
          copy this change dir and root `.env*` files into it, tell the user the path,
          and do all further work inside it.
-       Commit the artifacts: `docs(<KEY-123>): openspec <change-name>`.
+       Only if openspec/config.yaml `context` has `Commit artifacts: yes`, commit the
+       change dir: `docs(<KEY-123>): openspec <change-name>`. Otherwise (the default)
+       never stage or commit anything under openspec/.
 
     Read context files, work through pending tasks, mark complete as you go.
     Pause if you hit blockers or need clarification.
 
     REVIEW — when every task is checked and the project's format/lint/tests pass:
-    1. Commit the rest, `git push -u origin HEAD`.
+    1. Commit the rest (excluding openspec/ unless `Commit artifacts: yes`),
+       `git push -u origin HEAD`.
     2. Unless `gh pr view` finds one, `gh pr create --base <base-branch>` using the
        confirmed `Base branch:` from proposal.md — title `<KEY-123>: <proposal title>`,
        body: proposal summary, Jira link, change dir path. If an existing PR targets
