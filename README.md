@@ -154,6 +154,60 @@ These are skills. Most tools invoke them as `/openspec-propose` and Codex as `$o
 >
 > Also works with npm, Homebrew, pnpm, yarn, bun, and Nix. [See installation options](https://openspec.dev/docs/installation).
 
+## This fork's workflow: spec → Jira → branch → PR
+
+This fork extends the default `spec-driven` schema so `/openspec-apply-change` also runs your team's delivery flow. Planning (`proposal` → `specs` → `design` → `tasks`) is unchanged. Only apply is different.
+
+```text
+/openspec-propose  →  review the plan  →  /openspec-apply-change  →  PR in Review  →  /openspec-archive-change
+```
+
+### One-time setup
+
+Add these lines to `context` in `openspec/config.yaml`. Both are optional.
+
+```yaml
+context: |
+  Jira project: ABC          # skip it and the agent lists your projects and asks once
+  Commit artifacts: yes      # skip it and openspec/ files are never committed
+```
+
+You also need a **Jira MCP server** connected to your AI tool, plus `git` and the `gh` CLI. Apply uses Jira through MCP and has no fallback without it.
+
+### What happens when you run apply
+
+**Start** (before the first task):
+
+1. The agent asks **which branch to start from and open the PR against**, and **who to assign the Jira ticket to**. If you don't name an assignee, it uses the current Jira user. Nothing is created until you answer. Your answer is saved as `Base branch:` in `proposal.md`.
+2. It creates a Jira Story, or a Task if there is no Story. The ticket has the proposal title, the Why and What Changes, and the task list. It is assigned explicitly and moved to *In Progress*. `Jira: KEY-123 <url>` is added to `proposal.md`.
+3. It creates the branch `KEY-123-<change-name>`. If other work is already in your checkout, it uses a separate `git worktree` instead.
+4. The OpenSpec change files are committed only if you set `Commit artifacts: yes`.
+
+**Implement:** the agent works through `tasks.md` and ticks each task off.
+
+**Review** (all tasks done, format, lint and tests pass):
+
+1. It commits and pushes the branch. `openspec/` is left out unless you opted in.
+2. It opens a PR titled `KEY-123: <proposal title>` against your chosen base branch, or reuses the existing PR.
+3. It moves the Jira ticket to *Review* and comments the PR link on it.
+4. It reports the ticket, PR URL and branch or worktree path.
+
+Resuming later is safe. If `proposal.md` already has `Jira:` and `Base branch:` and you're on the task branch, the start step is skipped.
+
+The workflow is defined in [`schemas/spec-driven/schema.yaml`](schemas/spec-driven/schema.yaml) under `apply.instruction`.
+
+### Learn from finished work (opt-in)
+
+`/openspec-learn` reviews a completed change, PR or diff and gives up to three lessons. Each lesson cites files and lines. It never edits code, and it runs only when you ask. Enable it with `openspec config profile`, then `openspec update`.
+
+To save lessons to an Obsidian note, set a vault path. The agent shows you the note and asks before writing anything.
+
+```yaml
+# openspec/config.yaml
+learn:
+  obsidianVaultPath: /path/to/your/vault   # or set OPENSPEC_OBSIDIAN_VAULT
+```
+
 ## Docs
 
 Full documentation lives at **[openspec.dev/docs](https://openspec.dev/docs)**.
