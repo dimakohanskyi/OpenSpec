@@ -269,18 +269,23 @@ apply:
   requires: [tasks]
   tracks: tasks.md
   instruction: |
-    START — before the first pending task (skip only if proposal.md has `Jira:`
-    and a user-confirmed `Base branch:` line and you are already on its task branch).
-    Use the configured Jira MCP; never hardcode ids.
+    START — before the first pending task (skip only if proposal.md has a
+    user-confirmed `Base branch:` line, `Jira:` too unless Jira is off, and you are
+    already on its task branch).
+    Jira is ON unless openspec/config.yaml `context` has `Jira: off`. When off, skip
+    every Jira step below (assignee question, ticket, transitions, comments), use
+    `<change-name>` as the branch name and `<proposal title>` as the PR title, and
+    leave the branch, worktree, commit, push and PR steps unchanged.
+    When on, use the configured Jira MCP; never hardcode ids.
     0. Ask the user which existing branch to start from AND target the PR against:
        the default branch or a feature branch (for example, feature A for fixes).
        Wait for their answer before creating a ticket, branch, or worktree; never
        choose automatically. Verify the branch exists and record
        `Base branch: <base-branch>` in proposal.md. Reuse that confirmed choice on resume.
-       In the same question, ask who the Jira ticket should be assigned to; default
+       If Jira is on, in the same question, ask who the Jira ticket should be assigned to; default
        to the current Jira user (the one the MCP is authenticated as) if they give no
        one. Resolve a named person to their account id via the Jira MCP user lookup.
-    1. Ticket: Jira project = `Jira project:` in openspec/config.yaml `context`.
+    1. Ticket (Jira on only): Jira project = `Jira project:` in openspec/config.yaml `context`.
        If missing, list visible Jira projects, pick the one matching the repo name,
        confirm with the user once, then add `Jira project: <KEY>` to that context.
        Create a Story (Task if no Story) — summary: proposal title; description:
@@ -288,7 +293,7 @@ apply:
        Always set the assignee explicitly to the person chosen in step 0 (never leave
        it unassigned or to the project default) and tell the user who it went to.
        Put `Jira: <KEY-123> <url>` as line 2 of proposal.md. Move ticket to In Progress.
-    2. Checkout, branch `<KEY-123>-<change-name>`:
+    2. Checkout, branch `<KEY-123>-<change-name>` (`<change-name>` if Jira off):
        - On the confirmed base branch with no changes outside this change dir:
          `git switch -c <branch> <base-branch>` (uncommitted artifacts come along).
        - Otherwise another piece of work lives here, so isolate it in a worktree:
@@ -306,11 +311,11 @@ apply:
     1. Commit the rest (excluding openspec/ unless `Commit artifacts: yes`),
        `git push -u origin HEAD`.
     2. Unless `gh pr view` finds one, `gh pr create --base <base-branch>` using the
-       confirmed `Base branch:` from proposal.md — title `<KEY-123>: <proposal title>`,
-       body: proposal summary, Jira link, change dir path. If an existing PR targets
+       confirmed `Base branch:` from proposal.md — title `<KEY-123>: <proposal title>` (just `<proposal title>` if Jira off),
+       body: proposal summary, Jira link (if on), change dir path. If an existing PR targets
        a different base, pause and ask the user before changing it.
-    3. Move the Jira ticket to the transition containing "Review" (none: list and ask);
+    3. Jira on only: move the Jira ticket to the transition containing "Review" (none: list and ask);
        comment the PR URL on it.
-    4. Report ticket status, PR URL, branch/worktree path. If a worktree was used,
+    4. Report ticket status (if Jira on), PR URL, branch/worktree path. If a worktree was used,
        suggest `git worktree remove <path>` after the PR opens, from another
        directory and only after checking for uncommitted changes; do not run it.

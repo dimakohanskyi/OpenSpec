@@ -164,15 +164,16 @@ This fork extends the default `spec-driven` schema so `/openspec-apply-change` a
 
 ### One-time setup
 
-Add these lines to `context` in `openspec/config.yaml`. Both are optional.
+Add these lines to `context` in `openspec/config.yaml`. All are optional.
 
 ```yaml
 context: |
   Jira project: ABC          # skip it and the agent lists your projects and asks once
+  Jira: off                  # skip Jira entirely; branch, worktree, commit, push and PR still run
   Commit artifacts: yes      # skip it and openspec/ files are never committed
 ```
 
-You also need a **Jira MCP server** connected to your AI tool, plus `git` and the `gh` CLI. Apply uses Jira through MCP and has no fallback without it.
+You need `git` and the `gh` CLI. Unless you set `Jira: off`, you also need a **Jira MCP server** connected to your AI tool. With `Jira: off` the ticket steps are skipped, the branch is named `<change-name>` and the PR title is just the proposal title.
 
 ### What happens when you run apply
 
